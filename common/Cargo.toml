@@ -1,0 +1,8 @@
+[package]
+name = "adventofcode2024-common"
+version.workspace = true
+edition.workspace = true
+
+
+[dependencies]
+
