@@ -1,0 +1,52 @@
+name: ci
+
+on:
+  push:
+    branches:
+      - main
+  pull_request: {}
+
+env:
+  CARGO_TERM_COLOR: always
+  CARGO_INCREMENTAL: 0
+  RUST_BACKTRACE: short
+
+jobs:
+  style:
+    name: format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: nightly
+          components: rustfmt
+      - name: rustfmt
+        run: cargo fmt --all -- --check
+
+  check:
+    runs-on: ubuntu-latest
+    permissions:
+      checks: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: nightly
+          components: clippy
+      - name: clippy
+        uses: auguwu/clippy-action@1.4.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          check-args: --tests
+          deny: warnings
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: nightly
+      - name: test
+        run: cargo test --verbose
